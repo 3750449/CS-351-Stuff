@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="initShaders.js"></script>
+
+        <script id="vertex-shader" type="x-shader/x-vertex">
+            void main() {
+                // Your vertex shader code will go here
+            }
+        </script>
+        
+        <script id="fragment-shader" type="x-shader/x-fragment">
+            void main() {
+                // Your fragment shader code will go here
+            }
+        </script>
+
+        <script>
+            window.onload = () => {
+                var canvas = document.getElementById("webgl");
+                var gl = canvas.getContext("webgl2");
+
+                gl.clearColor(0.1, 0.1, 0.1, 1.0);
+
+                var program = initShaders(gl, "vertex-shader", "fragment-shader");
+                
+                // These are lines that we'll need a bit later.
+                // var uN = gl.getUniformLocation(program, "N");
+                // var uTime = gl.getUniformLocation(program, "t");
+
+                var t = 0.0;
+
+                var render = () => {
+                    t += 0.01;  // Tick time
+
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.useProgram(program);
+
+                    const N = 12; // number of vertices
+
+                    // Other code we'll need later, in combination with the
+                    //   code above marked for later use.
+                    // gl.uniform1f(uN, N);
+                    // gl.uniform1f(uTime, t);
+
+                    gl.drawArrays(gl.LINE_LOOP, 0, 3);
+
+                    requestAnimationFrame(render);
+                };
+
+                render();
+            };
+        </script>
+    </head>
+
+    <body>
+        <canvas id="webgl" width="512" height="512"></canvas>
+    </body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="initShaders.js"></script>
+
+    <!-- Vertex Shader -->
+    <script id="vertex-shader" type="x-shader/x-vertex">#version 300 es
+precision mediump float;
+
+uniform float N;
+uniform float t;
+
+out float radius;
+
+void main() {
+    if (gl_VertexID == 0) {
+        radius = 0.0;
+        gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+        return;
+    }
+
+    int vid = gl_VertexID - 1;
+    float angle = float(vid) * 3.14159 / 5.0 + t;
+    radius = (vid % 2 == 0) ? 1.0 : 0.4;
+    vec2 v = radius * vec2(cos(angle), sin(angle));
+    gl_Position = vec4(v, 0.0, 1.0);
+}
+    </script>
+
+    <!-- Fragment Shader -->
+    <script id="fragment-shader" type="x-shader/x-fragment">#version 300 es
+precision mediump float;
+
+in float radius;
+out vec4 fColor;
+
+void main() {
+    // Blend between red and blue based on radius
+    vec4 colorA = vec4(1.0, 0.0, 0.0, 1.0); // red
+    vec4 colorB = vec4(0.0, 0.0, 1.0, 1.0); // blue
+    fColor = mix(colorA, colorB, radius);
+}
+    </script>
+
+    <script>
+        window.onload = () => {
+            const canvas = document.getElementById("webgl");
+            const gl = canvas.getContext("webgl2");
+
+            if (!gl) {
+                console.error("WebGL2 not supported.");
+                return;
+            }
+
+            const program = initShaders(gl, "vertex-shader", "fragment-shader");
+            if (program === -1) {
+                console.error("Shader failed.");
+                return;
+            }
+
+            gl.useProgram(program);
+            gl.clearColor(0.1, 0.1, 0.1, 1.0);
+
+            const uN = gl.getUniformLocation(program, "N");
+            const uTime = gl.getUniformLocation(program, "t");
+            gl.uniform1f(uN, 12.0);
+
+            let time = 0;
+
+            function render() {
+                time += 0.02;
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                gl.uniform1f(uTime, time);
+                gl.drawArrays(gl.TRIANGLE_FAN, 0, 12);
+                requestAnimationFrame(render);
+            }
+
+            render();
+        };
+    </script>
+</head>
+
+<body>
+    <canvas id="webgl" width="512" height="512"></canvas>
+</body>
+</html>

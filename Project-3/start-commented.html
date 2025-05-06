@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- This includes our helper script initShaders.js.  Think of it
+          sort of like a #include in C++ -->
+        <script src="initShaders.js"></script>
+
+        <!-- This is where we'll define our vertex shader.  Each shader
+            contains a main() function (ours currently is empty, but you
+            need one just to have the program execute) -->
+        <script id="vertex-shader" type="x-shader/x-vertex">
+            void main() {
+                // Your vertex shader code will go here
+            }
+        </script>
+        
+        <!-- Here's our fragment shader.  Same story as for the vertex
+            shader. -->
+        <script id="fragment-shader" type="x-shader/x-fragment">
+            void main() {
+                // Your fragment shader code will go here
+            }
+        </script>
+
+        <!-- Here's our main "program", written in JavaScript (JS).  Our
+            program uses a number of JS lambda functions, which have the form of () => { ... }.  If you need to pass parameters (we don't in
+            this case), you put those between the parenthesis, and the rest
+            of the code goes between the braces. 
+            
+            As you've probably figured out, this is a comment block for HTML.
+            Inside of a JS block, you use C/C++-style comments.
+        -->
+        <script>
+            // This is the function executed when the web page loads.
+            //   Think of it like main() in a C++ program
+            window.onload = () => {
+                // This queries the web page to find a specific "element"
+                //   which in this case is a Canvas area that we'll render
+                //   WebGL into.  Once we find the canvas, we get a WebGL
+                //   context from it, and begin configuring our rendering
+                //   (in this case, setting the color that we'll clear
+                //   the rendering area's background to)
+                var canvas = document.getElementById("webgl");
+                var gl = canvas.getContext("webgl2");
+
+                gl.clearColor(0.1, 0.1, 0.1, 1.0);
+
+                // This line uses our helper function to compile and link
+                //   our shader programs.  Each shader is given a name
+                //   (through it's "id" attribute), and we pass those
+                //   names here.  The routine finds the source of the
+                //   shaders, compiles and links them (a bit like compiling)
+                //   a C++ program, and reports any errors if there are any.
+                //
+                // If there are any errors from your shaders, a little
+                //   dialog window will open on the page.  Unfortunately,
+                //   the diagnostics for shader compilation are horrible,
+                //   so just be really careful writing your shaders.  They're
+                //   simple, so it should hopefully be simple to avoid that
+                //   situation.
+                var program = initShaders(gl, "vertex-shader", "fragment-shader");
+                
+                // These are lines that we'll need a bit later.
+                // var uN = gl.getUniformLocation(program, "N");
+                // var uTime = gl.getUniformLocation(program, "t");
+
+                // A convenient variable to simulate the passing of time
+                var t = 0.0;
+
+                // Another JS lambda function, stored in a variable named
+                //   render().  Each time we want a frame of animation,
+                //   we'll have the Web browser request a call to our
+                //   render() function.
+                var render = () => {
+                    t += 0.01;  // Tick time
+
+                    // Clear our window, and enable our shaders
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.useProgram(program);
+
+                    // Specify how many vertices we'd like generated
+                    //   This variable will be used twice, which is why
+                    //   it's not hard-coded into functions.
+                    const N = 12; // number of vertices
+
+                    // Other code we'll need later, in combination with the
+                    //   code above marked for later use.
+                    // gl.uniform1f(uN, N);
+                    // gl.uniform1f(uTime, t);
+
+                    // Request that vertices are processed.  In this case,
+                    //   we're requesting that the vertices be grouped to
+                    //   be a triangle fan.
+                    gl.drawArrays(gl.LINE_LOOP, 0, 3);
+
+                    // Request that our render() function is called again
+                    //   at some point in the future.  We use the
+                    //   requestAnimationFrame() function, as we can't 
+                    //   directly call render() from render(), because that'd
+                    //   be an infante recursion, which would ultimately
+                    //   blow up the stack, but worse, would never let
+                    //   render() complete, so we'd never get an image.
+                    requestAnimationFrame(render);
+                };
+
+                // Call render() to kick everything off
+                render();
+            };
+        </script>
+    </head>
+
+    <!-- This is the bit of HTML that you actually see in the browser.
+           For us, it'll just be our canvas element, but you could add
+           text, buttons, or anything else to make up the page. -->
+    <body>
+        <canvas id="webgl" width="512" height="512"></canvas>
+    </body>
+</html>
